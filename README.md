@@ -291,26 +291,3 @@ dataset so the whole experience is reproducible.
 
 ---
 
-## Interview Talking Points — What This Demonstrates
-
-- **Production-leaning architecture, MVP-scoped:** clear separation of routers /
-  services / models / schemas; async SQLAlchemy with proper session DI; typed
-  Pydantic v2 contracts mirrored by TypeScript interfaces on the frontend.
-- **Pragmatic AI engineering:** retrieval-augmented chat backed by pgvector,
-  with a **deterministic hash-based embedding fallback** so the system is
-  testable and demoable offline — and a single switch to flip on real OpenAI.
-- **Resilient external-integration design:** every third-party client (RentCast,
-  Google Maps, OpenAI) has a mock path keyed off its own credential, so the app
-  degrades gracefully and runs with **zero accounts** — a real-world pattern for
-  cost control, local dev, and CI.
-- **Async + background work done right:** FastAPI async endpoints for request
-  latency, Celery + Redis for ingest/enrich/embed pipelines that shouldn't block
-  the request path.
-- **Full-stack ownership:** JWT auth end-to-end, protected App-Router pages with
-  an auth guard, React Query caching, and a clean responsive Tailwind UI.
-- **Dev experience:** one-command bring-up (`make up`) with healthchecks and a
-  reproducible seed, Swagger docs out of the box, and a documented path from
-  mock data to live providers.
-- **Domain modeling:** a normalized schema (users, properties, neighborhoods,
-  analyses, saved) with UUID PKs, JSONB for flexible lists, and a vector column —
-  reflecting the actual entities of a valuation/lead-intel product.
