@@ -1,0 +1,254 @@
+/* Inter is loaded at runtime by the browser (not at build time) so the
+   Docker build never depends on Google Fonts connectivity. Falls back to a
+   system font stack if offline. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #0f172a;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Soft, premium canvas: a light base with subtle indigo/violet glows. */
+  background-color: #f6f7fb;
+  background-image:
+    radial-gradient(60rem 60rem at 12% -10%, rgba(99, 102, 241, 0.10), transparent 55%),
+    radial-gradient(50rem 50rem at 100% 0%, rgba(124, 58, 237, 0.08), transparent 50%),
+    radial-gradient(45rem 45rem at 50% 120%, rgba(79, 70, 229, 0.06), transparent 55%);
+  background-attachment: fixed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(99, 102, 241, 0.22);
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes gradient-pan {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes sheen {
+  to {
+    transform: translateX(230%) skewX(-15deg);
+  }
+}
+
+/* Sweeping highlight on primary buttons (runs once per hover). */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 55%;
+  transform: translateX(-180%) skewX(-15deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.55),
+    transparent
+  );
+  pointer-events: none;
+}
+.btn-primary:hover::before {
+  animation: sheen 0.85s ease;
+}
+
+/* Slowly drifting gradient (pair with a Tailwind gradient bg). */
+.animated-gradient {
+  background-size: 220% 220%;
+  animation: gradient-pan 16s ease infinite;
+}
+
+/* Staggered entrance: children fade up in sequence. */
+.stagger > * {
+  opacity: 0;
+  animation: appear 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.stagger > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 0.19s;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 0.26s;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 0.33s;
+}
+.stagger > *:nth-child(6) {
+  animation-delay: 0.4s;
+}
+.stagger > *:nth-child(7) {
+  animation-delay: 0.47s;
+}
+.stagger > *:nth-child(8) {
+  animation-delay: 0.54s;
+}
+.stagger > *:nth-child(9) {
+  animation-delay: 0.61s;
+}
+
+/* Respect users who prefer less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Refined, slim scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.35) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.35);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.55);
+}
+
+@layer components {
+  /* Surfaces ------------------------------------------------------------- */
+  .card {
+    @apply rounded-2xl border border-slate-200/70 bg-white shadow-card;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-card-hover;
+  }
+
+  .glass {
+    @apply border border-white/60 bg-white/70 backdrop-blur-xl;
+  }
+
+  .panel-header {
+    @apply sticky top-0 z-10 border-b border-slate-200/70 bg-white/75 backdrop-blur-xl;
+  }
+
+  /* Buttons -------------------------------------------------------------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply btn relative overflow-hidden bg-brand-gradient text-white shadow-glow hover:shadow-[0_16px_40px_-8px_rgba(79,70,229,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:brightness-95;
+  }
+
+  .btn-secondary {
+    @apply btn border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50;
+  }
+
+  .btn-ghost {
+    @apply btn text-slate-600 hover:bg-slate-100 hover:text-slate-900;
+  }
+
+  /* Forms ---------------------------------------------------------------- */
+  .input {
+    @apply w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/15;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500;
+  }
+
+  /* Badges & chips ------------------------------------------------------- */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+  .badge-brand {
+    @apply badge bg-brand-50 text-brand-700 ring-1 ring-inset ring-brand-100;
+  }
+  .badge-success {
+    @apply badge bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-100;
+  }
+  .badge-warn {
+    @apply badge bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-100;
+  }
+  .badge-danger {
+    @apply badge bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-100;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700;
+  }
+
+  /* Misc ----------------------------------------------------------------- */
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-600 to-accent-600 bg-clip-text text-transparent;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-2xl bg-slate-100;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.65),
+      transparent
+    );
+    animation: shimmer 1.6s infinite;
+  }
+}
