@@ -167,6 +167,12 @@ a {
   background-color: rgba(100, 116, 139, 0.55);
 }
 
+/* Leaflet: strip the default white box/border so custom price pins show through. */
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}
+
 @layer components {
   /* Surfaces ------------------------------------------------------------- */
   .card {

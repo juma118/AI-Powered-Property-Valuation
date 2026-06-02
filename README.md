@@ -223,6 +223,10 @@ returns canned-but-plausible responses — **no network calls are made**.
   floats), so vector search works identically across runs.
 - **OpenAI chat / analysis** → returns canned-but-plausible summaries, pros/cons,
   and scores so every feature is demonstrable.
+- **Map (frontend)** → the Search → **Map** view renders an interactive map
+  (Leaflet + OpenStreetMap tiles) with a price pin per result; click a pin for an
+  address/price popup and a link to the detail page. It needs **no API key, token,
+  or account** — OpenStreetMap tiles are free to use.
 
 **To use real data**, set `USE_MOCK_DATA=false` in `.env` and provide whichever
 keys you have:

@@ -8,6 +8,7 @@ import type { Property, SearchResponse } from '@/lib/types';
 import AuthGuard from '@/components/AuthGuard';
 import Sidebar from '@/components/Sidebar';
 import PropertyCard from '@/components/PropertyCard';
+import PropertyMap from '@/components/PropertyMap';
 
 interface Filters {
   city: string;
@@ -63,20 +64,16 @@ function formatPrice(price: number | null | undefined): string {
   }).format(price);
 }
 
-function MapPlaceholder({ results }: { results: Property[] }) {
+function MapView({ results }: { results: Property[] }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-6">
       <div className="mb-4 flex items-center gap-2 text-slate-600">
         <MapPin className="h-5 w-5" />
         <span className="text-sm font-medium">
-          Map preview ({results.length} pins) — interactive map disabled in MVP
+          Map view — {results.length} {results.length === 1 ? 'property' : 'properties'}
         </span>
       </div>
-      <div className="relative h-72 overflow-hidden rounded-xl border border-dashed border-slate-300 bg-[radial-gradient(circle_at_20%_30%,#e2e8f0,transparent_40%),radial-gradient(circle_at_70%_60%,#dbeafe,transparent_45%)]">
-        <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-400">
-          Styled map placeholder
-        </div>
-      </div>
+      <PropertyMap results={results} />
       <ul className="mt-4 grid gap-2 sm:grid-cols-2">
         {results.map((p) => (
           <li
@@ -317,7 +314,7 @@ export default function SearchPage() {
                     ))}
                   </div>
                 ) : (
-                  <MapPlaceholder results={results} />
+                  <MapView results={results} />
                 )}
               </>
             )}
