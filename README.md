@@ -6,11 +6,6 @@ enriches it with neighborhood signals (Google Maps), generates AI valuations and
 investment analysis (OpenAI), and exposes it through a semantic-search +
 RAG-chat experience with a clean React dashboard.
 
-> **Runs with zero external accounts.** With `USE_MOCK_DATA=true` (the default),
-> every external client returns deterministic mock data and the AI layer returns
-> canned-but-plausible responses. `cp .env.example .env && make up && make seed`
-> and you have a fully working app — no RentCast / Google / OpenAI keys required.
-
 ---
 
 ## Problem Statement

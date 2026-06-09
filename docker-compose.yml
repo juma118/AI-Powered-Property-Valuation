@@ -46,7 +46,7 @@ services:
       # In docker the services talk over the compose network, not localhost.
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/proptech
       REDIS_URL: redis://redis:6379/0
-      CORS_ORIGINS: http://localhost:3000
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3001
     depends_on:
       db:
         condition: service_healthy
