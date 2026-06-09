@@ -27,6 +27,10 @@ env/
 .env.local
 *.local
 
+# --- Local-only helpers (not part of the project) ---
+tools/
+docker-compose.override.yml
+
 # --- OS / editor ---
 .DS_Store
 Thumbs.db

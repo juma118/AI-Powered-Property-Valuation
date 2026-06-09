@@ -26,51 +26,6 @@ inventory in natural language via retrieval-augmented chat over vector embedding
 
 ---
 
-## Architecture
-
-```
-                              ┌─────────────────────────────┐
-                              │        Next.js 14 (TS)       │
-                              │  App Router · Tailwind ·     │
-                              │  React Query · axios         │
-                              │  /login / /search /property  │
-                              │  /chat /saved  dashboard     │
-                              └───────────────┬─────────────┘
-                                              │ HTTPS JSON (Bearer JWT)
-                                              │  NEXT_PUBLIC_API_URL=/api
-                                              ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                            FastAPI backend (/api)                          │
-│                                                                            │
-│  routers/   auth · properties · dashboard · chat · saved · health         │
-│  deps.py    get_current_user (JWT Bearer)                                  │
-│  services/  ┌─ valuation / comparables / analysis (AI)                     │
-│             ├─ search (filters + keyword)                                  │
-│             ├─ chat (RAG: embed query → vector search → answer)            │
-│             └─ external clients ── RentCast · GoogleMaps · OpenAI          │
-│                                     (mock fallback when key empty /        │
-│                                      USE_MOCK_DATA=true)                    │
-└───────┬───────────────────────────────┬────────────────────────┬──────────┘
-        │ async SQLAlchemy (asyncpg)     │ Celery tasks            │  httpx
-        ▼                                ▼                         ▼
-┌────────────────────┐        ┌────────────────────┐     ┌──────────────────┐
-│ Postgres + pgvector│◀──────▶│  Celery worker     │     │  External APIs   │
-│ users properties   │        │  ingest / enrich / │     │  RentCast        │
-│ neighborhoods      │        │  embed pipeline    │     │  Google Maps     │
-│ analyses saved     │        └─────────┬──────────┘     │  OpenAI          │
-│ embedding Vector   │                  │ broker/backend  └──────────────────┘
-│ (1536)             │                  ▼
-└────────────────────┘        ┌────────────────────┐
-                              │   Redis 7           │
-                              └────────────────────┘
-```
-
-**Request flow (example — semantic chat):** browser → `POST /api/chat/query`
-→ `services/chat` embeds the query (OpenAI or hash fallback) → pgvector
-cosine search over `properties.embedding` → builds context → OpenAI chat (or
-canned answer) → returns `{answer, properties, sources}`.
-
----
 
 ## Tech Stack
 
@@ -105,39 +60,36 @@ Plus: JWT auth (register/login/refresh/me) and saved properties with notes/label
 
 ---
 
-## Repository Structure
+## Screenshots
 
-```
-rentcast_AI_mlsfeeds/
-├── backend/                  FastAPI service (Python 3.11)
-│   ├── app/
-│   │   ├── main.py           app factory + lifespan (create_all) + router mount
-│   │   ├── config.py         pydantic-settings Settings (reads .env)
-│   │   ├── database.py       async engine, session, Base, get_db
-│   │   ├── deps.py           get_current_user auth dependency
-│   │   ├── security.py       password hashing + JWT create/decode
-│   │   ├── models/           SQLAlchemy ORM models
-│   │   ├── schemas/          Pydantic v2 request/response models
-│   │   ├── services/         business logic + external clients (mock fallback)
-│   │   ├── routers/          API routers mounted under /api
-│   │   ├── workers/          Celery app + tasks + ingest/enrich pipeline
-│   │   └── seed.py           seeds DB with mock properties
-│   ├── requirements.txt
-│   └── Dockerfile
-├── frontend/                 Next.js 14 app (TS + Tailwind + React Query)
-│   ├── app/                  /login, /(dashboard), /search, /property/[id], /chat, /saved
-│   ├── components/           sidebar nav, cards, auth guard
-│   ├── lib/                  api.ts (axios client) + types.ts
-│   ├── package.json, next.config.mjs, tsconfig.json
-│   ├── tailwind.config.ts, postcss.config.mjs
-│   └── Dockerfile
-├── docker-compose.yml        db · redis · backend · worker · frontend
-├── init.sql                  CREATE EXTENSION vector
-├── .env.example              all env vars (mock mode on by default)
-├── Makefile                  up / down / seed / logs / fe-dev / be-dev
-├── .gitignore
-└── README.md
-```
+> Captured against the stack running locally in **mock mode** (no external API keys),
+> signed in as the seeded demo account.
+
+### Dashboard — KPIs, recommendations & recent activity
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Search — filterable list & interactive map (Leaflet + OpenStreetMap)
+
+| List view | Map view |
+|-----------|----------|
+| ![Search results](docs/screenshots/search.png) | ![Map view](docs/screenshots/search-map.png) |
+
+### Property detail — gallery, stats & AI valuation
+
+| Overview | AI Summary (scores, pros/cons) |
+|----------|--------------------------------|
+| ![Property detail](docs/screenshots/property-detail.png) | ![AI analysis](docs/screenshots/property-ai.png) |
+
+### Semantic RAG chat — ask in plain English, grounded in the inventory
+
+![RAG chat](docs/screenshots/chat.png)
+
+### Saved properties & sign-in
+
+| Saved | Sign in |
+|-------|---------|
+| ![Saved properties](docs/screenshots/saved.png) | ![Login](docs/screenshots/login.png) |
 
 ---
 
