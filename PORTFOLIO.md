@@ -127,5 +127,3 @@ docker compose up --build -d
 # open http://localhost:3000   ·   API docs: http://localhost:8000/docs
 # demo login: demo@proptech.io / demo1234
 ```
-
-*See [README.md](README.md) for full setup, API reference, and the data-pipeline deep dive.*
