@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { LayoutGrid, MapPin, Search as SearchIcon, Loader2 } from 'lucide-react';
 import { searchProperties } from '@/lib/api';
+import { formatCurrency } from '@/lib/format';
 import type { Property, SearchResponse } from '@/lib/types';
 import AuthGuard from '@/components/AuthGuard';
 import Sidebar from '@/components/Sidebar';
@@ -55,15 +56,6 @@ function buildParams(filters: Filters) {
   };
 }
 
-function formatPrice(price: number | null | undefined): string {
-  if (price == null) return '—';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
 function MapView({ results }: { results: Property[] }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-6">
@@ -87,7 +79,7 @@ function MapView({ results }: { results: Property[] }) {
               </span>
             </span>
             <span className="shrink-0 font-semibold text-slate-900">
-              {formatPrice(p.price)}
+              {formatCurrency(p.price)}
             </span>
           </li>
         ))}

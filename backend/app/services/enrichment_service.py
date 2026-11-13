@@ -1,8 +1,4 @@
 """Neighborhood enrichment via Google Maps (Geocoding + Places).
-
-Real calls when GOOGLE_MAPS_API_KEY is present and mock mode is off; otherwise
-deterministic mock values derived from a hash of the property's coordinates and
-address so output is stable across runs.
 """
 
 from __future__ import annotations
@@ -13,6 +9,7 @@ from typing import Any, Optional
 import httpx
 
 from app.config import get_settings
+from app.utils import get_attr as _attr
 
 GEOCODE_URL = "https://maps.googleapis.com/maps/api/geocode/json"
 PLACES_NEARBY_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
@@ -169,9 +166,3 @@ class EnrichmentService:
             "crime_score": float(crime_score),
             "nearby_schools": schools,
         }
-
-
-def _attr(obj: Any, name: str) -> Any:
-    if isinstance(obj, dict):
-        return obj.get(name)
-    return getattr(obj, name, None)

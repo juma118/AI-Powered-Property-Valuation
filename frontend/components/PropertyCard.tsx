@@ -3,14 +3,7 @@
 import Link from 'next/link';
 import { Bed, Bath, Ruler, MapPin } from 'lucide-react';
 import type { Property } from '@/lib/types';
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-  }).format(price);
-}
+import { formatCurrency } from '@/lib/format';
 
 export default function PropertyCard({
   property,
@@ -50,7 +43,7 @@ export default function PropertyCard({
           {/* price pill */}
           <div className="absolute bottom-3 left-3">
             <span className="rounded-xl bg-white/95 px-3 py-1.5 text-base font-bold text-slate-900 shadow-md backdrop-blur">
-              {formatPrice(property.price)}
+              {formatCurrency(property.price)}
             </span>
           </div>
         </div>

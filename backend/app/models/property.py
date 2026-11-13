@@ -59,9 +59,6 @@ class Property(Base):
         server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    # lazy="selectin" so these load eagerly within the async session — required
-    # because Pydantic serialization (Property.model_validate) accesses them
-    # outside the await context, which would otherwise raise MissingGreenlet.
     neighborhood: Mapped[Optional["Neighborhood"]] = relationship(
         back_populates="property",
         uselist=False,

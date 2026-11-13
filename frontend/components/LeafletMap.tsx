@@ -6,16 +6,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin } from 'lucide-react';
 import type { Property } from '@/lib/types';
+import { formatCurrency } from '@/lib/format';
 import 'leaflet/dist/leaflet.css';
-
-function formatPrice(price: number | null | undefined): string {
-  if (price == null) return '—';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 function shortPrice(price: number | null | undefined): string {
   if (price == null) return '—';
@@ -107,7 +99,7 @@ export default function LeafletMap({ results }: { results: Property[] }) {
           <Marker key={p.id} position={[p.lat, p.lng]} icon={priceIcon(p.price)}>
             <Popup>
               <div className="space-y-1.5">
-                <p className="text-sm font-bold text-slate-900">{formatPrice(p.price)}</p>
+                <p className="text-sm font-bold text-slate-900">{formatCurrency(p.price)}</p>
                 <p className="flex items-start gap-1 text-xs text-slate-600">
                   <MapPin className="mt-0.5 h-3 w-3 shrink-0 text-indigo-500" />
                   <span>

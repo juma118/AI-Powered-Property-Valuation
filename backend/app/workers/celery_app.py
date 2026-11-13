@@ -1,13 +1,4 @@
 """Celery application for the proptech background workers.
-
-Broker and result backend both point at ``settings.redis_url`` (Redis).
-Run a worker with::
-
-    celery -A app.workers.celery_app:celery_app worker --loglevel=info
-
-Run the beat scheduler with::
-
-    celery -A app.workers.celery_app:celery_app beat --loglevel=info
 """
 
 from __future__ import annotations
@@ -37,8 +28,6 @@ celery_app.conf.update(
     broker_connection_retry_on_startup=True,
 )
 
-# Periodic schedule for the ETL pipeline. Refresh popular markets nightly and
-# warm the read caches more frequently.
 celery_app.conf.beat_schedule = {
     "refresh-popular-markets-nightly": {
         "task": "app.workers.tasks.run_pipeline_task",

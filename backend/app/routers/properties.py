@@ -22,6 +22,16 @@ class AnalysisRequest(BaseModel):
     property_id: UUID
 
 
+async def _get_property_or_404(db: AsyncSession, property_id: UUID):
+    prop = await property_service.get_property(db, property_id)
+    if prop is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Property not found.",
+        )
+    return prop
+
+
 @router.get("/search", response_model=SearchResponse)
 async def search(
     db: AsyncSession = Depends(get_db),
@@ -36,7 +46,6 @@ async def search(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
 ) -> SearchResponse:
-    # Ensure the local store is populated for the requested area (mock-aware).
     await property_service.ingest_search(
         db,
         city=city,
@@ -74,12 +83,7 @@ async def get_property(
     property_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> Property:
-    prop = await property_service.get_property(db, property_id)
-    if prop is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Property not found.",
-        )
+    prop = await _get_property_or_404(db, property_id)
     return Property.model_validate(prop)
 
 
@@ -88,12 +92,7 @@ async def comparables(
     property_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> ComparablesResponse:
-    prop = await property_service.get_property(db, property_id)
-    if prop is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Property not found.",
-        )
+    await _get_property_or_404(db, property_id)
 
     comps, stats = await property_service.get_comparables(db, property_id)
     return ComparablesResponse(
@@ -107,12 +106,7 @@ async def get_analysis(
     property_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> PropertyAnalysis:
-    prop = await property_service.get_property(db, property_id)
-    if prop is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Property not found.",
-        )
+    prop = await _get_property_or_404(db, property_id)
 
     analysis = getattr(prop, "analysis", None)
     if analysis is None:
@@ -130,12 +124,7 @@ async def create_analysis(
     payload: AnalysisRequest,
     db: AsyncSession = Depends(get_db),
 ) -> PropertyAnalysis:
-    prop = await property_service.get_property(db, payload.property_id)
-    if prop is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Property not found.",
-        )
+    await _get_property_or_404(db, payload.property_id)
 
     analysis = await property_service.generate_analysis(db, payload.property_id)
     if analysis is None:

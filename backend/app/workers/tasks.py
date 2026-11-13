@@ -1,25 +1,4 @@
 """Celery tasks implementing the proptech data pipeline.
-
-Pipeline stages (per stage of the ETL):
-
-    Pull -> Normalize -> Store -> Geocode -> Embed -> Analyze
-
-Each task is fully self-contained: it opens its **own** async SQLAlchemy
-session (Celery workers run in synchronous worker processes, so we bridge to
-async via ``asyncio.run``) and delegates to the relevant service in
-``app.services``. Tasks are defensive: every task body is wrapped in
-try/except with structured logging so a single failure never poisons the
-worker, and a serializable result dict is always returned.
-
-Service contract assumed (see ``app.services.property_service``):
-
-    async def ingest_search(db, *, city, state, limit=...) -> list[Property]
-    async def generate_embeddings(db, *, limit=...) -> int
-    async def generate_analysis(db, property_id) -> Analysis
-
-Run a worker::
-
-    celery -A app.workers.celery_app:celery_app worker --loglevel=info
 """
 
 from __future__ import annotations
@@ -77,10 +56,6 @@ async def _with_session(fn):
 @celery_app.task(name="app.workers.tasks.refresh_listings", bind=True, max_retries=3)
 def refresh_listings(self, city: str, state: str, limit: int = 20) -> dict[str, Any]:
     """Pull -> Normalize -> Store -> Geocode for a single market.
-
-    Delegates to ``property_service.ingest_search`` which performs the RentCast
-    pull, normalization, upsert into ``properties``, and neighborhood/geocode
-    enrichment. Returns a summary dict suitable for the Celery result backend.
     """
     from app.services import property_service
 
@@ -110,10 +85,6 @@ def refresh_listings(self, city: str, state: str, limit: int = 20) -> dict[str, 
 @celery_app.task(name="app.workers.tasks.generate_embeddings_task", bind=True, max_retries=2)
 def generate_embeddings_task(self, limit: int = 100) -> dict[str, Any]:
     """Embed stage: generate vector embeddings for properties missing one.
-
-    Delegates to ``property_service.generate_embeddings`` which selects rows
-    where ``embedding IS NULL`` and populates them (OpenAI or deterministic
-    hash-based fallback). Returns the number embedded.
     """
     from app.services import property_service
 
@@ -136,9 +107,6 @@ def generate_embeddings_task(self, limit: int = 100) -> dict[str, Any]:
 @celery_app.task(name="app.workers.tasks.run_ai_analysis", bind=True, max_retries=3)
 def run_ai_analysis(self, property_id: str) -> dict[str, Any]:
     """Analyze stage: generate + persist the AI analysis for one property.
-
-    Delegates to ``property_service.generate_analysis``. ``property_id`` is
-    passed as a string (Celery JSON serialization) and coerced to ``UUID``.
     """
     from app.services import property_service
 
@@ -166,10 +134,6 @@ def run_ai_analysis(self, property_id: str) -> dict[str, Any]:
 @celery_app.task(name="app.workers.tasks.warm_cache")
 def warm_cache() -> dict[str, Any]:
     """Warm read-side caches (dashboard recents, popular searches).
-
-    For the MVP this simply runs the lightweight dashboard/recents queries so
-    connection pools and (future) Redis caches are primed. It is robust to the
-    optional ``property_service`` cache hooks not existing yet.
     """
     from app.services import property_service
 
@@ -199,10 +163,6 @@ def warm_cache() -> dict[str, Any]:
 @celery_app.task(name="app.workers.tasks.run_pipeline_task")
 def run_pipeline_task(cities: Optional[Iterable[Any]] = None) -> dict[str, Any]:
     """Scheduled orchestrator: run the full ETL pipeline for a set of markets.
-
-    ``cities`` is a list of ``[city, state]`` pairs (JSON-friendly). Invoked by
-    Celery beat (see ``celery_app.beat_schedule``). Delegates to
-    ``pipeline.run_full_pipeline`` which performs ingest + embed + analyze.
     """
     from app.workers.pipeline import run_full_pipeline
 

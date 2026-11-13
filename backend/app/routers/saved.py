@@ -26,14 +26,7 @@ async def list_saved(
         await db.execute(
             select(SavedPropertyModel)
             .where(SavedPropertyModel.user_id == current_user.id)
-            .options(
-                selectinload(SavedPropertyModel.property).selectinload(
-                    PropertyModel.neighborhood
-                ),
-                selectinload(SavedPropertyModel.property).selectinload(
-                    PropertyModel.analysis
-                ),
-            )
+            .options(selectinload(SavedPropertyModel.property))
             .order_by(SavedPropertyModel.created_at.desc())
         )
     ).scalars().all()
@@ -47,7 +40,7 @@ async def create_saved(
     db: AsyncSession = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ) -> SavedProperty:
-    # Validate the property exists.
+    
     prop = (
         await db.execute(
             select(PropertyModel).where(PropertyModel.id == payload.property_id)
@@ -59,7 +52,7 @@ async def create_saved(
             detail="Property not found.",
         )
 
-    # Idempotent on (user_id, property_id): update existing instead of duplicating.
+    
     existing = (
         await db.execute(
             select(SavedPropertyModel).where(
@@ -91,14 +84,7 @@ async def create_saved(
         await db.execute(
             select(SavedPropertyModel)
             .where(SavedPropertyModel.id == saved.id)
-            .options(
-                selectinload(SavedPropertyModel.property).selectinload(
-                    PropertyModel.neighborhood
-                ),
-                selectinload(SavedPropertyModel.property).selectinload(
-                    PropertyModel.analysis
-                ),
-            )
+            .options(selectinload(SavedPropertyModel.property))
         )
     ).scalar_one()
 

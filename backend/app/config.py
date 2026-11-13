@@ -6,8 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment / .env file."""
-
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -30,15 +29,10 @@ class Settings(BaseSettings):
     openai_embedding_model: str = "text-embedding-3-small"
     openai_chat_model: str = "gpt-4o-mini"
 
-    # Infra
     redis_url: str = "redis://redis:6379/0"
 
-    # Behavior
     use_mock_data: bool = True
-
-    # CORS — stored as a raw string (comma-separated or JSON list) so that
-    # pydantic-settings does not attempt to JSON-decode it from the env var.
-    # Consume the parsed value via `cors_origins_list`.
+    
     cors_origins: str = "http://localhost:3000,http://localhost:3001"
 
     @property
@@ -59,8 +53,7 @@ class Settings(BaseSettings):
     @property
     def embedding_dim(self) -> int:
         return 1536
-
-    # Uppercase aliases consumed by the service layer (rentcast/enrichment/ai).
+    
     @property
     def USE_MOCK_DATA(self) -> bool:
         return self.use_mock_data

@@ -15,25 +15,8 @@ import Sidebar from '@/components/Sidebar';
 import PropertyCard from '@/components/PropertyCard';
 import CountUp from '@/components/CountUp';
 import { dashboardSummary, recommendations } from '@/lib/api';
+import { formatCurrency, formatNumber } from '@/lib/format';
 import type { DashboardSummary, Property } from '@/lib/types';
-
-function formatCurrency(value: number | null | undefined): string {
-  if (value === null || value === undefined || Number.isNaN(value)) {
-    return '—';
-  }
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function formatNumber(value: number | null | undefined): string {
-  if (value === null || value === undefined || Number.isNaN(value)) {
-    return '0';
-  }
-  return new Intl.NumberFormat('en-US').format(value);
-}
 
 interface MetricCardProps {
   label: string;

@@ -1,18 +1,4 @@
 """Database seed script.
-
-Running ``python -m app.seed`` (or calling ``seed(db)``) bootstraps a fresh
-database so the app is usable immediately with zero external accounts:
-
-1. Ensures the schema exists (``init_db``).
-2. If the ``properties`` table is empty, ingests mock listings for a few
-   markets via ``property_service.ingest_search`` (Pull -> Normalize -> Store
-   -> Geocode), generates AI analyses for roughly the first 8 properties
-   (Analyze), and populates embeddings (Embed).
-3. Creates a demo user ``demo@proptech.io`` / ``demo1234`` if absent.
-
-The whole thing is **idempotent**: re-running it never duplicates data. It
-relies on the deterministic mock fallback in the services, so it works with
-``USE_MOCK_DATA=true`` and empty API keys.
 """
 
 from __future__ import annotations
@@ -25,8 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger("app.seed")
 
-# Markets to seed (city, state). Matches the RentCast mock anchors so the
-# mock generator returns rich, varied listings.
 _SEED_CITIES: list[tuple[str, str]] = [
     ("Austin", "TX"),
     ("Denver", "CO"),
@@ -119,8 +103,6 @@ async def _analyze(db: AsyncSession, ingested: list) -> None:
 
 async def seed(db: AsyncSession) -> dict:
     """Idempotently seed the database. Safe to run repeatedly.
-
-    Returns a small report dict describing what was done.
     """
     report = {"properties_seeded": 0, "demo_user": DEMO_EMAIL}
 
@@ -133,8 +115,6 @@ async def seed(db: AsyncSession) -> dict:
     else:
         logger.info("seed: properties already present -> skipping listing seed")
 
-    # Demo user is created independently so it exists even on a partially
-    # seeded DB.
     await _ensure_demo_user(db)
     return report
 
@@ -143,7 +123,6 @@ async def _main() -> None:
     logging.basicConfig(level=logging.INFO)
     from app.database import AsyncSessionLocal, init_db
 
-    # Make sure tables + pgvector extension exist before seeding.
     await init_db()
 
     async with AsyncSessionLocal() as session:

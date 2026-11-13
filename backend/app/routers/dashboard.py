@@ -3,7 +3,6 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.deps import get_current_user
@@ -38,7 +37,7 @@ async def summary(
         )
     ).scalar_one()
 
-    # "New opportunities": high-investment-score properties.
+    
     new_opportunities = (
         await db.execute(
             select(func.count())
@@ -50,10 +49,6 @@ async def summary(
     recent_rows = (
         await db.execute(
             select(PropertyModel)
-            .options(
-                selectinload(PropertyModel.neighborhood),
-                selectinload(PropertyModel.analysis),
-            )
             .order_by(PropertyModel.created_at.desc())
             .limit(6)
         )
@@ -73,15 +68,11 @@ async def recommendations(
     db: AsyncSession = Depends(get_db),
     current_user: UserModel = Depends(get_current_user),
 ) -> RecommendationsResponse:
-    # Prefer properties with the highest investment score.
+    
     scored_rows = (
         await db.execute(
             select(PropertyModel)
             .join(AnalysisModel, AnalysisModel.property_id == PropertyModel.id)
-            .options(
-                selectinload(PropertyModel.neighborhood),
-                selectinload(PropertyModel.analysis),
-            )
             .order_by(AnalysisModel.investment_score.desc())
             .limit(6)
         )
@@ -89,16 +80,12 @@ async def recommendations(
 
     rows = list(scored_rows)
 
-    # Fall back to recent listings if no analyses exist yet.
+
     if not rows:
         rows = list(
             (
                 await db.execute(
                     select(PropertyModel)
-                    .options(
-                        selectinload(PropertyModel.neighborhood),
-                        selectinload(PropertyModel.analysis),
-                    )
                     .order_by(PropertyModel.created_at.desc())
                     .limit(6)
                 )

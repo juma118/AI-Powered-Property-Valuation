@@ -1,8 +1,4 @@
 """AI service: embeddings, property analysis, and chat.
-
-Uses OpenAI when OPENAI_API_KEY is configured and mock mode is off; otherwise
-returns deterministic, plausible results computed from the property numbers.
-No network calls are made in mock mode.
 """
 
 from __future__ import annotations
@@ -14,16 +10,9 @@ import struct
 from typing import Any, Optional
 
 from app.config import get_settings
+from app.utils import get_attr as _attr
 
 EMBEDDING_DIM = 1536
-
-
-def _attr(obj: Any, name: str, default: Any = None) -> Any:
-    if obj is None:
-        return default
-    if isinstance(obj, dict):
-        return obj.get(name, default)
-    return getattr(obj, name, default)
 
 
 class AIService:
@@ -63,13 +52,7 @@ class AIService:
     @staticmethod
     def _mock_embed(text: str) -> list[float]:
         """Deterministic pseudo-vector derived from a hash of the text.
-
-        Produces a stable, L2-normalized 1536-float vector. Similar strings
-        produce identical vectors and different strings differ, which is enough
-        for the mock semantic ordering to be deterministic.
         """
-        # Expand a SHA-256 digest into enough bytes via a counter, then unpack
-        # into floats and normalize.
         floats: list[float] = []
         counter = 0
         seed = (text or " ").encode("utf-8")

@@ -40,16 +40,13 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db() -> None:
-    """Ensure pgvector extension exists and create all tables."""
-    # Import models so that Base.metadata is fully populated before create_all.
+    """Ensure pgvector extension exists and create all tables."""    
     import app.models  # noqa: F401
 
     async with engine.begin() as conn:
-        # pgvector extension is required for the Vector embedding column.
+        
         try:
             await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-        except Exception:
-            # If the DB user lacks privileges, the extension may already be
-            # created via init.sql. Don't crash startup.
+        except Exception:        
             pass
         await conn.run_sync(Base.metadata.create_all)

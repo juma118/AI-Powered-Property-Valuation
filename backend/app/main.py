@@ -67,12 +67,8 @@ async def health() -> dict:
     return {"status": "ok"}
 
 
-# Routers are built by another agent; include each defensively so the app
-# still boots even if one module is not yet present.
 def _include_routers() -> None:
-    # Each router module already declares its own prefix (e.g. "/auth"), so they
-    # are all mounted under the shared "/api" base — NOT "/api/auth" etc., which
-    # would double the path segment (e.g. /api/auth/auth/login).
+
     router_specs = [
         ("app.routers.auth", "/api", ["auth"]),
         ("app.routers.properties", "/api", ["properties"]),

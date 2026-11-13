@@ -43,10 +43,6 @@ class PropertyAnalysis(BaseModel):
 
 class Property(BaseModel):
     """Full property representation.
-
-    Mirrors the ``properties`` table exactly. The raw ``embedding`` column is
-    intentionally excluded from output. Optional ``neighborhood`` and
-    ``analysis`` are embedded when present on the ORM object.
     """
 
     model_config = ConfigDict(from_attributes=True)

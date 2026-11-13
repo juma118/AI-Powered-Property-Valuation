@@ -17,14 +17,14 @@ async def query(
     payload: ChatRequest,
     db: AsyncSession = Depends(get_db),
 ) -> ChatResponse:
-    # Retrieve relevant properties via semantic (vector) search.
+    
     matches = await property_service.semantic_search(db, payload.query, limit=5)
 
     context_props = []
     properties: list[Property] = []
     sources: list[ChatSource] = []
     for item in matches:
-        # semantic_search returns (property, score) pairs (or bare properties).
+        
         if isinstance(item, tuple):
             prop, score = item[0], item[1]
         else:

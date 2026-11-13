@@ -25,6 +25,7 @@ import {
   generateAnalysis,
   addSaved,
 } from '@/lib/api';
+import { formatCurrency } from '@/lib/format';
 import type {
   Property,
   PropertyAnalysis,
@@ -44,18 +45,9 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'ai', label: 'AI Summary' },
 ];
 
-function formatPrice(price: number | null | undefined): string {
-  if (price == null) return '—';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
 function pricePerSqft(price?: number | null, sqft?: number | null): string {
   if (!price || !sqft) return '—';
-  return formatPrice(Math.round(price / sqft));
+  return formatCurrency(Math.round(price / sqft));
 }
 
 export default function PropertyDetailsPage() {
@@ -140,7 +132,7 @@ export default function PropertyDetailsPage() {
                   {property.city}, {property.state} {property.zip}
                 </p>
                 <p className="mt-3 text-4xl font-extrabold tracking-tight gradient-text">
-                  {formatPrice(property.price)}
+                  {formatCurrency(property.price)}
                 </p>
               </div>
               <button
@@ -264,7 +256,7 @@ export default function PropertyDetailsPage() {
                 </Card>
                 <Card title="Estimated value">
                   <p className="text-3xl font-bold text-slate-900">
-                    {formatPrice(analysis?.estimated_value)}
+                    {formatCurrency(analysis?.estimated_value)}
                   </p>
                   <p className="mt-1 text-xs text-slate-400">
                     {analysis ? 'AI estimated' : 'Run AI analysis for an estimate'}
@@ -350,15 +342,15 @@ export default function PropertyDetailsPage() {
                       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                         <Stat
                           label="Avg price"
-                          value={formatPrice(comparablesQuery.data.stats.avg_price)}
+                          value={formatCurrency(comparablesQuery.data.stats.avg_price)}
                         />
                         <Stat
                           label="Avg $/sqft"
-                          value={formatPrice(comparablesQuery.data.stats.avg_price_per_sqft)}
+                          value={formatCurrency(comparablesQuery.data.stats.avg_price_per_sqft)}
                         />
                         <Stat
                           label="Subject $/sqft"
-                          value={formatPrice(comparablesQuery.data.stats.subject_price_per_sqft)}
+                          value={formatCurrency(comparablesQuery.data.stats.subject_price_per_sqft)}
                         />
                         <Stat label="Comparables" value={comparablesQuery.data.stats.count} />
                       </div>
