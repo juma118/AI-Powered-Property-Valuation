@@ -1,11 +1,4 @@
 """RentCast listings client.
-
-Real network call to https://api.rentcast.io/v1/listings when a key is
-configured AND mock mode is disabled. Otherwise a deterministic generator
-produces ~30 varied, realistic listings so the app runs with zero accounts.
-
-Output dicts are normalized to match the `properties` table columns plus
-`external_id`.
 """
 
 from __future__ import annotations
@@ -164,7 +157,6 @@ class RentCastClient:
         limit: int = 20,
     ) -> list[dict[str, Any]]:
         """Return normalized listing dicts.
-
         Real network call when configured; otherwise filtered mock data.
         """
         if self._use_mock:

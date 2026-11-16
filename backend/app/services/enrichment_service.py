@@ -130,9 +130,6 @@ class EnrichmentService:
     # ------------------------------------------------------------------
     async def build_neighborhood(self, property: Any) -> dict[str, Any]:
         """Build a dict matching the `neighborhoods` table columns.
-
-        `property` may be an ORM Property instance or a dict with at least
-        lat/lng/address.
         """
         lat = _attr(property, "lat")
         lng = _attr(property, "lng")

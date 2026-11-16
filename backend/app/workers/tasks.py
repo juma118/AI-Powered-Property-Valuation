@@ -20,9 +20,6 @@ logger = logging.getLogger("app.workers.tasks")
 
 def _run(coro) -> Any:
     """Run an async coroutine to completion from a sync Celery worker.
-
-    Uses a fresh event loop each call so it is safe regardless of whether the
-    worker pool has a pre-existing loop bound to the thread.
     """
     try:
         loop = asyncio.new_event_loop()

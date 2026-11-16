@@ -1,13 +1,4 @@
 """Property business logic used by the routers.
-
-Coordinates the RentCast client, enrichment service, and AI service with the
-database. All DB operations are async (SQLAlchemy 2.x async session).
-
-Conventions:
-- `params` may be a dict or any object exposing the search attributes
-  (city, state, min_price, max_price, beds, baths, min_sqft, keywords,
-  limit, offset).
-- `id` values are property UUIDs (str or uuid.UUID).
 """
 
 from __future__ import annotations
@@ -77,10 +68,6 @@ def _p(params: Any, name: str, default: Any = None) -> Any:
 
 def _merge_params(params: Any, kwargs: dict[str, Any]) -> dict[str, Any]:
     """Accept either a params dict/object (positional) or keyword arguments.
-
-    All public service entry points accept keyword args (the convention used by
-    the routers, seed, pipeline and workers); a positional dict/object is also
-    supported for flexibility.
     """
     merged: dict[str, Any] = {}
     if isinstance(params, dict):
@@ -433,9 +420,6 @@ async def generate_analysis(db: AsyncSession, id: Any) -> Optional[Analysis]:
 # ---------------------------------------------------------------------------
 async def semantic_search(db: AsyncSession, query: str, limit: int = 6) -> list[Property]:
     """Embed the query and order by pgvector cosine distance.
-
-    Falls back to ILIKE keyword search when no embeddings are available or the
-    vector query fails.
     """
     query = (query or "").strip()
     if not query:
